@@ -1,0 +1,61 @@
+<project name="Landscape" default="build" basedir=".">
+
+    <property name="version" value="0.2.0"/>
+    <property name="productName" value="Landscape"/>
+
+    <property name="main-class" value="world.Main"/>
+
+    <path id="compile.classpath">
+        <fileset dir="lib" includes="*.jar"/>
+    </path>
+
+    <target name="clean" description="Remove old build artifacts">
+        <delete dir="build"/>
+        <delete dir="bin"/>
+        <delete dir="dist"/>
+    </target>
+
+    <target name="compile">
+        <mkdir dir="build/classes"/>
+        <javac classpathref="compile.classpath"
+               destdir="build/classes"
+               srcdir="src"
+               debug="yes"
+               failonerror="yes"
+               source="1.6"
+               target="1.6"
+               includeantruntime="no"/>
+    </target>
+
+    <target name="build"
+        description="Builds everything from scratch"
+        depends="compile"/>
+
+    <target name="jar" depends="compile">
+        <mkdir dir="dist"/>
+        <jar jarfile="dist/${productName}-${version}.jar"
+             basedir="build/classes"/>
+    </target>
+    
+    <target name="dist" depends="clean, build, jar">
+        <zip destfile="dist/${productName}-${version}.zip" compress="true">
+            <zipfileset prefix="${productName}" dir=".">
+                <exclude name="dist/**"/>
+                <exclude name="build/**"/>
+                <exclude name="bin/**"/>
+            </zipfileset>
+        </zip>
+        
+    </target>
+
+    <target name="run" depends="jar">
+        <java fork="true" classname="${main-class}">
+            <classpath>
+                <path refid="compile.classpath"/>
+                <path location="dist/${productName}-${version}.jar"/>
+            </classpath>
+        </java>
+    </target>
+
+</project>
+
